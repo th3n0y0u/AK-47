@@ -8,6 +8,7 @@ local function mainclass()
 	local onzoom = events:WaitForChild("OnZoom")
 	local onsprint = events:WaitForChild("OnSprint")
 	local oncrouch = events:WaitForChild("OnCrouch")
+	local onheat = events:WaitForChild("OnHeat")
 	local userinputservice = game:GetService("UserInputService")
 	local runservice = game:GetService("RunService")
 	local ammo = values:WaitForChild("Ammo")
@@ -17,6 +18,7 @@ local function mainclass()
 	local reserveammo = values:WaitForChild("ReserveAmmo")
 	local spread = values:WaitForChild("Spread")
 	local gui = tool:WaitForChild("ToolGUI")
+	local heat = tool:WaitForChild("HeatBar")
 	local sprinting = false 
 	local hasBayonet = false
 	local reloading = false
@@ -24,6 +26,8 @@ local function mainclass()
 	local zoomed = false
 	local crouching = false
 	local prone = false
+	local jammed = false
+	local heatvalue = 0
 
 	local Players = game:GetService("Players")
 	local client = Players.LocalPlayer
@@ -41,7 +45,8 @@ local function mainclass()
 	local NeckOriginC0 = Neck.C0
 	local WaistOriginC0 = Waist.C0 
 	
-	local animations = {script.Equip, 
+	local animations = {
+		script.Equip, 
 		script.Unequip,
 		script.Reload, 
 		script.Aim, 
@@ -70,6 +75,8 @@ local function mainclass()
 		local success, errormessage = pcall(function()
 			if equipped == false and hasBayonet == false then
 				equipped = true
+				local newheat = heat:Clone()
+				newheat.Parent = tool.Body 
 				local animationlength = loadanimations[1].Length
 				loadanimations[1]:Play()
 				client.CameraMode = Enum.CameraMode.LockFirstPerson
@@ -88,6 +95,16 @@ local function mainclass()
 						else
 							newgui.Frame.Ammo.Text = ammo.Value.."/"..clipsize.Value
 							newgui.Frame.ReserveAmmo.Text = reserveammo.Value
+							
+							newheat.BarFrame.Bar.Size = UDim2.new(0.01 * heatvalue, 0, 0, 0)  
+							heatvalue -= 0.01
+							if heatvalue < 50 then
+								newheat.BarFrame.Bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+							elseif heatvalue >= 51 then
+								newheat.BarFrame.Bar.BackgroundColor3 = Color3.fromRGB(255, 255, 0)
+							elseif heatvalue >= 75 then
+								newheat.BarFrame.Bar.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+							end
 						end
 						if client.Character.Humanoid.Health < 0 then
 							Camera.CameraMode = Enum.CameraMode.Classic
@@ -138,10 +155,12 @@ local function mainclass()
 				if input.KeyCode == Enum.KeyCode.R then
 					if reloading == false and equipped == true and hasBayonet == false then
 						if ammo.Value <= clipsize.Value then
+							
 							local animationlength = loadanimations[3].Length
 							loadanimations[3]:Play()
 							reloading = true 
 							local newgui = client.PlayerGui:WaitForChild("ToolGUI")
+							
 							if newgui then
 								newgui.Frame.Ammo.Text = "Reloading..."
 								onreload:FireServer() 
@@ -149,6 +168,11 @@ local function mainclass()
 								wait(1) -- temp until animation
 								newgui.Frame.Ammo.Text = clipsize.Value.."/"..clipsize.Value
 							end
+						
+							if jammed == true then
+								jammed = false
+							end
+							
 							reloading = false
 							loadanimations[3]:Stop()
 						else
@@ -174,17 +198,22 @@ local function mainclass()
 						local animationlength = loadanimations[5].Length
 						loadanimations[5]:Play()
 						wait(animationlength)
+						
 						onknife:FireServer(hasBayonet)
 						local newgui = client.PlayerGui:WaitForChild("ToolGUI")
 						newgui.Frame.Ammo.Text = "Using Bayonet"
+						
 					elseif hasBayonet == true and reloading == false and equipped == true then 
 						hasBayonet = false
 						local animationlength2 = loadanimations[6].Length
 						loadanimations[6]:Play()
 						wait(animationlength2)
+						
 						onknife:FireServer(hasBayonet)
+						
 						local newgui = client.PlayerGui:WaitForChild("ToolGUI")
 						newgui.Frame.Ammo.Text = ammo.Value.."/"..clipsize.Value
+						
 						Humanoid:UnequipTools()
 						Humanoid:EquipTool(tool)
 					end
@@ -199,10 +228,43 @@ local function mainclass()
 
 	local function shoot()
 		local success, errormessage = pcall(function()
-			if reloading == false and equipped == true and hasBayonet == false then 
+			if reloading == false and equipped == true and hasBayonet == false and jammed == false then 
+				
 				loadanimations[4]:Play()
 				onshoot:FireServer(cursor.Hit.Position)
+				heatvalue += 1
 				loadanimations[4]:Stop()
+				if heatvalue >= 100 then
+				
+					local explosion = Instance.new("Explosion")
+					explosion.BlastRadius = 100
+					explosion.ExplosionType = "NoCraters"
+					explosion.BlastPressure = 1000000
+					explosion.Parent = client.Character.Head
+					
+					for i, v in pairs(client.Character:GetChildren()) do
+						if v:IsA("MeshPart") or v:IsA("Part") then
+							local fire = Instance.new("Fire")
+							fire.Heat = 10
+							fire.Size = 10
+							fire.Parent = v
+						end
+					end
+					
+					heatvalue = 0
+					client.CameraMode = Enum.CameraMode.Classic
+					
+					onheat:FireServer(client.Character)
+					
+				end
+				
+				local num = math.random(1, 100)
+				if num == 57 then
+					if jammed == false then
+						jammed = true
+					end
+				end
+				
 			else
 				print("Not Reloading...")
 			end
@@ -292,11 +354,13 @@ local function mainclass()
 					if prone == false then
 						if crouching == false then
 							crouching = true
+							
 							oncrouch:FireServer(crouching, prone)
 							loadanimations[8]:Play()
 						elseif crouching == true then
 							crouching = false
 							prone = true
+							
 							oncrouch:FireServer(crouching, prone)
 							loadanimations[8]:Stop()
 							wait(1)
@@ -304,6 +368,7 @@ local function mainclass()
 						end
 					elseif prone == true and crouching == false then
 						prone = false
+						
 						oncrouch:FireServer(crouching, prone)
 						loadanimations[9]:Stop()
 					end
@@ -318,8 +383,10 @@ local function mainclass()
 	
 	local function died()
 		local success, errormessage = pcall(function()
+			
 			cursor.Icon = "rbxassetid://0"; 
 			client.CameraMode = Enum.CameraMode.Classic 
+			
 		end)
 		
 		if not success then
