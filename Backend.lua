@@ -21,6 +21,7 @@ local function mainclass()
 	local onkill = events:WaitForChild("OnKill")
 	local oncrouch = events:WaitForChild("OnCrouch")
 	local onsprint = events:WaitForChild("OnSprint")
+	local onheat = events:WaitForChild("OnHeat")
 	local gui = tool:WaitForChild("ToolGUI")
 	
 	local deathsounds = {
@@ -184,6 +185,10 @@ local function mainclass()
 
 					ammo.Value -= 1
 					sound()
+					local raycastParams = RaycastParams.new()
+					
+					raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+					
 					local origin = shoot_part.Position
 					
 					local direction = (position - origin).Unit*300
@@ -194,16 +199,30 @@ local function mainclass()
 						origin.Z + math.random(-spread.Value, spread.Value) / spread.Value
 					)
 					
-					local result = Workspace:Raycast(spreadPosition, direction) 
-
-					local intersection = result and result.Position or origin + direction
-					local distance = (origin - intersection).Magnitude
-					
 					local bullet_clone = Instance.new("Part")
 					local bodyvelocity = Instance.new("BodyPosition", bullet_clone) 
 					local beam = Instance.new("Beam", bullet_clone)
 					local attachment1 = Instance.new("Attachment", shoot_part)
 					local attachment2 = Instance.new("Attachment", bullet_clone)
+					local shell = tool.Shell:Clone() 
+					
+					raycastParams.FilterDescendantsInstances = {
+						bullet_clone, 
+						shell,
+						tool.Blade,
+						tool.Handle,
+						tool.EjectionPart,
+						tool.Body, 
+						tool.Mag,
+						
+					}
+					
+					local result = Workspace:Raycast(spreadPosition, direction, raycastParams) 
+
+					local intersection = result and result.Position or origin + direction
+					local distance = (origin - intersection).Magnitude
+					 
+					shoot_part:WaitForChild("FlashGui").Enabled = true
 					attachment1.Name = "Attachment0"
 					attachment2.Name = "Attachment1"
 					bullet_clone.Name = "Bullet"
@@ -229,13 +248,14 @@ local function mainclass()
 						bodyvelocity.Position = result.Position
 					end
 					
-					local shell = tool.Shell:Clone()
 					for i, v in pairs(shell:GetChildren()) do
 						v:Destroy()
 					end
 					shell.Parent = game.Workspace
 					shell.CFrame = CFrame.new(ejection.Position)
 					shell.Velocity = shell.Velocity + Vector3.new(0, 20, 0)
+					
+					shoot_part:WaitForChild("FlashGui").Enabled = false
 					
 					if result then
 						local part = result.Instance
@@ -265,10 +285,109 @@ local function mainclass()
 								end
 								--]]
 								
+								local function sound()
+									local number = math.random(1, 10) 
+									if number == 5 then
+										
+										local voices = {
+											"rbxassetid://993905304",
+											"rbxassetid://998679945",
+											"rbxassetid://993908890",
+											"rbxassetid://993907407"
+										}
+										
+										local function voice()
+											local sound = Instance.new("Sound", tool)
+											sound.SoundId = voices[math.random(1, #voices)] 
+											sound.Volume = 1
+											sound.PlaybackSpeed = 1
+											sound:Play()
+											coroutine.resume(coroutine.create(function()
+												wait(sound.TimeLength)
+												sound:Destroy()
+											end))
+										end
+										
+										voice()
+									end
+								end
+								
+								sound()
 							end 
+							
+						elseif not humanoid then
+							
+							local materialsounds = {
+								"rbxassetid://6962155378",
+								"rbxassetid://4072627278",
+								"rbxassetid://2064193435",
+								"rbxassetid://142082167",
+								"rbxassetid://5361945710"
+								
+							}
+							
+							local function materialsound(num)
+								local sound = Instance.new("Sound", tool)
+								sound.SoundId = materialsounds[num]
+								sound.Volume = 1
+								sound.PlaybackSpeed = 1
+								sound:Play()
+								coroutine.resume(coroutine.create(function()
+									wait(1.358)
+									sound:Destroy()
+								end))
+							end
+							
+							if result.Material then
+								
+								if result.Material == Enum.Material.Concrete then
+									materialsound(1)
+								elseif result.Material == Enum.Material.Metal then
+									materialsound(2)
+								elseif result.Material == Enum.Material.Glass then
+									materialsound(4)
+								elseif result.Material == Enum.Material.Air then
+									materialsound(5)
+								else
+									materialsound(3)
+								end
+							end
+							
 						end
 					end
-
+					
+					local function dropshell()
+						local sound = Instance.new("Sound", tool)
+						sound.SoundId = "rbxassetid://5693069131" 
+						sound.Volume = 0.2
+						sound.PlaybackSpeed = 1
+						sound:Play()
+						coroutine.resume(coroutine.create(function()
+							wait(1.358)
+							sound:Destroy()
+						end))
+					end
+					
+					local function drop(hit)
+						
+						local dropdebounce = false
+						
+						if dropdebounce == false then
+							dropdebounce = true
+							if hit then
+								if hit:IsA("Part") then
+									if hit.Parent == game.Workspace["The map"] then
+										dropshell()
+									end
+								end
+							end
+							wait(1)
+							dropdebounce = false
+						end
+						
+					end
+					
+					shell.Touched:Connect(drop)
 					wait(firerate.Value)
 					debounce = false
 					bullet_clone:Destroy()
@@ -332,7 +451,7 @@ local function mainclass()
 								wait(1.358)
 								sound:Destroy()
 							end))
-						end
+						end 
 
 						if hit then
 							if knifedebounce == false then
@@ -488,6 +607,10 @@ local function mainclass()
 			warn(errormessage)
 		end
 	end
+	
+	local function heat(player, char)
+		player.Character:BreakJoints()
+	end
 
 	onshoot.OnServerEvent:Connect(shoot)
 	onreload.OnServerEvent:Connect(reload)
@@ -495,6 +618,7 @@ local function mainclass()
 	onzoom.OnServerEvent:Connect(zoom)
 	onsprint.OnServerEvent:Connect(sprinting)
 	oncrouch.OnServerEvent:Connect(crouch)
+	onheat.OnServerEvent:Connect(heat)
 	tool.Equipped:Connect(equip)
 	tool.Unequipped:Connect(unequip)
 	player.Character.Humanoid.Died:Connect(death)
