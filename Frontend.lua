@@ -264,12 +264,12 @@ local function mainclass()
 					
 				end
 				
-				local num = math.random(1, 100)
-				if num == 57 then
+				local num = math.random(1, 1000)
+				if num == 1 then
 					if jammed == false then
 						jammed = true
 					end
-				end
+				end 
 				
 			else
 				print("Not Reloading...")
