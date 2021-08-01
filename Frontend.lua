@@ -46,15 +46,15 @@ local function mainclass()
 	local WaistOriginC0 = Waist.C0 
 	
 	local animations = {
-		script.Equip, 
-		script.Unequip,
-		script.Reload, 
-		script.Aim, 
-		script.KnifeEquip,
-		script.KnifeUnequip, 
-		script.Sprinting, 
-		script.Crouch, 
-		script.Prone,
+		script:WaitForChild("Equip"),
+		script:WaitForChild("Unequip"),
+		script:WaitForChild("Reload"), 
+		script:WaitForChild("Aim"), 
+		script:WaitForChild("KnifeEquip"),
+		script:WaitForChild("KnifeUnequip"), 
+		script:WaitForChild("Sprinting"), 
+		script:WaitForChild("Crouch"), 
+		script:WaitForChild("Prone"),
 	}
 	
 	local loadanimations = {
@@ -77,6 +77,7 @@ local function mainclass()
 				equipped = true
 				local newheat = heat:Clone()
 				newheat.Parent = tool.Body 
+				newheat.Enabled = true
 				local animationlength = loadanimations[1].Length
 				loadanimations[1]:Play()
 				client.CameraMode = Enum.CameraMode.LockFirstPerson
@@ -97,7 +98,7 @@ local function mainclass()
 							newgui.Frame.ReserveAmmo.Text = reserveammo.Value
 							
 							newheat.BarFrame.Bar.Size = UDim2.new(0.01 * heatvalue, 0, 0, 0)  
-							heatvalue -= 0.01
+							heatvalue -= 0.1
 							if heatvalue < 50 then
 								newheat.BarFrame.Bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 							elseif heatvalue >= 51 then
@@ -237,7 +238,7 @@ local function mainclass()
 				if heatvalue >= 100 then
 				
 					local explosion = Instance.new("Explosion")
-					explosion.BlastRadius = 100
+					explosion.BlastRadius = 10
 					explosion.ExplosionType = "NoCraters"
 					explosion.BlastPressure = 1000000
 					explosion.Parent = client.Character.Head
@@ -253,6 +254,9 @@ local function mainclass()
 					
 					heatvalue = 0
 					client.CameraMode = Enum.CameraMode.Classic
+					local newheat = tool.Body:WaitForChild("HeatBar")
+					newheat:Destroy()
+					cursor.Icon = "rbxassetid://0";  
 					
 					onheat:FireServer(client.Character)
 					
