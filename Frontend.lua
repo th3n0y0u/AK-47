@@ -98,7 +98,9 @@ local function mainclass()
 							newgui.Frame.ReserveAmmo.Text = reserveammo.Value
 							
 							newheat.BarFrame.Bar.Size = UDim2.new(0.01 * heatvalue, 0, 0, 0)  
-							heatvalue -= 0.1
+							if heatvalue ~= 0 then
+								heatvalue -= 0.1
+							end
 							if heatvalue < 50 then
 								newheat.BarFrame.Bar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 							elseif heatvalue >= 51 then
