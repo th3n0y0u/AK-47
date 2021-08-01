@@ -238,6 +238,9 @@ local function mainclass()
 				heatvalue += 1
 				loadanimations[4]:Stop()
 				if heatvalue >= 100 then
+						
+					local newheat = tool.Body:WaitForChild("HeatBar")
+					newheat:Destroy()
 				
 					local explosion = Instance.new("Explosion")
 					explosion.BlastRadius = 10
@@ -256,8 +259,6 @@ local function mainclass()
 					
 					heatvalue = 0
 					client.CameraMode = Enum.CameraMode.Classic
-					local newheat = tool.Body:WaitForChild("HeatBar")
-					newheat:Destroy()
 					cursor.Icon = "rbxassetid://0";  
 					
 					onheat:FireServer(client.Character)
