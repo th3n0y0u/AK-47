@@ -48,62 +48,62 @@ local function shoot(player, position)
 			local fire = script.ParticleEmitter:Clone()
 			fire.Enabled = true
 			fire.Parent = tool.ShootPart
-		end 
 		
-		local raycast = workspace:Raycast(origin, direction, raycastParams)
-		
-		if raycast then
+			local raycast = workspace:Raycast(origin, direction, raycastParams)
 			
-			local part = raycast.Instance
-			local char = part.Parent
-			
-			if char then
-				if char:FindFirstChild("Humanoid") then
-					
-					wait(0.04)
-					if char.Head:FindFirstChild("Fire") == nil then
-						for i, v in pairs(char:GetChildren()) do
-							if v:IsA("MeshPart") or v:IsA("Part") then
-								local partfire = Instance.new("Fire")
-								partfire.Heat = 5
-								partfire.Size = 5
-								partfire.Parent = v
-							end
-						end
+			if raycast then
+				
+				local part = raycast.Instance
+				local char = part.Parent
+				
+				if char then
+					if char:FindFirstChild("Humanoid") then
 						
-						local count = 0
-						
-						while count < 10 and wait() do
-							if count <= 3 then
-								char.Humanoid:TakeDamage(damage.Value * 2)
-							else
-								char.Humanoid:TakeDamage(damage.Value / 4)
+						wait(0.04)
+						if char.Head:FindFirstChild("Fire") == nil then
+							for i, v in pairs(char:GetChildren()) do
+								if v:IsA("MeshPart") or v:IsA("Part") then
+									local partfire = Instance.new("Fire")
+									partfire.Heat = 5
+									partfire.Size = 5
+									partfire.Parent = v
+								end
 							end
 							
-							if count >= 10 then
-								
-								for i, v in pairs(char:GetChildren()) do
-									local destroy = v:WaitForChild("Fire")
-									
-									if destroy then
-										game:GetService("Debris"):AddItem(destroy, 1)
-									end
+							local count = 0
+							
+							while count < 10 and wait() do
+								if count <= 3 then
+									char.Humanoid:TakeDamage(damage.Value * 2)
+								else
+									char.Humanoid:TakeDamage(damage.Value / 4)
 								end
 								
-								break
-								
-							else
-								continue
+								if count >= 10 then
+									
+									for i, v in pairs(char:GetChildren()) do
+										local destroy = v:WaitForChild("Fire")
+										
+										if destroy then
+											game:GetService("Debris"):AddItem(destroy, 1)
+										end
+									end
+									
+									break
+									
+								else
+									continue
+								end
 							end
 						end
+						
 					end
-					
 				end
 			end
+		
+			shootsound()
+			ammo.Value -= 1
 		end
-	
-		shootsound()
-		ammo.Value -= 1
 	end
 end
 
