@@ -414,4 +414,6 @@ local function mainclass()
 	tool.Unequipped:Connect(unequip)
 end
 
+script.Parent.Instructions:Destroy()
+print("Server-Sided Script loading - From Kar98k") 
 mainclass()
