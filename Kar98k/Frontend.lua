@@ -169,14 +169,14 @@ local function mainclass()
 						loadedanimations[5]:Play()
 						wait(length)
 						loadedanimations[5]:Stop()
+						humanoid:UnequipTools()
+						humanoid:EquipTool(tool) 
 					elseif hasBayonet == false then
 						hasBayonet = true
 						local length = loadedanimations[6].Length
 						loadedanimations[6]:Play()
 						wait(length)
-						loadedanimations[6]:Stop() 
-						humanoid:UnequipTools()
-						humanoid:EquipTool(tool)
+						loadedanimations[6]:Stop()
 					end
 					onbayonet:FireServer(hasBayonet)
 				elseif input.KeyCode == Enum.KeyCode.X then
