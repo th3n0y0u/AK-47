@@ -270,4 +270,5 @@ local function mainclass()
 	runservice.RenderStepped:Connect(look)
 end
 
+print("Client-Sided script loaded - from Kar98k")
 mainclass()
