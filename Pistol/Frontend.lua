@@ -1,8 +1,9 @@
 local function mainclass()
 	
 	local tool = script.Parent
-	local player = game.Players.LocalPlayer
-	local char = player.Character or player.CharacterAdded:Wait()
+	local players = game:GetService("Players")
+	local player = players.LocalPlayer
+	local char = (player.Character or player.CharacterAdded:Wait())
 	local humanoid = char:WaitForChild("Humanoid")
 	local animator = humanoid:WaitForChild("Animator")
 	local userinputservice = game:GetService("UserInputService")
@@ -21,12 +22,10 @@ local function mainclass()
 	local reloading = false
 	local equipped = false
 
-	local animator = char:WaitForChild("Humanoid"):WaitForChild("Animator") 
-	local cursor = player:GetMouse() 
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
 	local Head = char:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck")
+	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
 	local Torso = char:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
 	local HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
@@ -168,7 +167,7 @@ local function mainclass()
 
 				if Neck and Waist then
 					if Camera.CameraSubject:IsDescendantOf(char) or Camera.CameraSubject:IsDescendantOf(player) then
-						local Point = cursor.Hit.p
+						local Point = mouse.Hit.p
 
 						local Distance = (Head.CFrame.p - Point).Magnitude
 						local Difference = Head.CFrame.Y - Point.Y
@@ -197,3 +196,4 @@ end
 
 print("Client-Sided script loaded - from pistol")
 mainclass()
+
