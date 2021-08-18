@@ -1,6 +1,7 @@
 local function mainclass()
 	local tool = script.Parent
-	local player = game.Players.LocalPlayer 
+	local players = game:GetService("Players")
+	local player = players.LocalPlayer 
 	local char = player.Character or player.CharacterAdded:Wait()
 	local humanoid = player.Character:WaitForChild("Humanoid")
 	local animator = humanoid:WaitForChild("Animator")
@@ -19,13 +20,12 @@ local function mainclass()
 	local gui = tool:WaitForChild("ToolGUI")
 
 	local Camera = workspace.CurrentCamera
-	local Character = player.Character or player.CharacterAdded:Wait()
-	local Head = Character:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck")
-	local Torso = Character:WaitForChild("UpperTorso")
+
+	local Head = char:WaitForChild("Head")
+	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
+	local Torso = char:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
-	local Humanoid = Character:WaitForChild("Humanoid")
-	local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+	local HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
 	local NeckOriginC0 = Neck.C0
 	local WaistOriginC0 = Waist.C0 
 	local debounce = false
@@ -164,12 +164,12 @@ local function mainclass()
 		local success, errormessage = pcall(function()
 			local CameraCFrame = Camera.CoordinateFrame
 
-			if Character:FindFirstChild("UpperTorso") and Character:FindFirstChild("Head") then
+			if char:FindFirstChild("UpperTorso") and char:FindFirstChild("Head") then
 				local TorsoLookVector = Torso.CFrame.LookVector
 				local HeadPosition = Head.CFrame.p
 
 				if Neck and Waist then
-					if Camera.CameraSubject:IsDescendantOf(Character) or Camera.CameraSubject:IsDescendantOf(player) then
+					if Camera.CameraSubject:IsDescendantOf(char) or Camera.CameraSubject:IsDescendantOf(player) then
 						local Point = mouse.Hit.p
 
 						local Distance = (Head.CFrame.p - Point).Magnitude
