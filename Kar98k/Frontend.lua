@@ -1,6 +1,8 @@
 local function mainclass()
+	 
 	local tool = script.Parent
-	local player = game.Players.LocalPlayer
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
 	local char = player.Character or player.CharacterAdded:Wait()
 	local userinputservice = game:GetService("UserInputService")
 	local runservice = game:GetService("RunService")
@@ -23,15 +25,11 @@ local function mainclass()
 	local hasBayonet = false
 	local zoomed = false
 	local sprinting = false
-
-	local Players = game:GetService("Players")
-	local client = Players.LocalPlayer
-	local animator = char:WaitForChild("Humanoid"):WaitForChild("Animator") 
-	local cursor = client:GetMouse() 
+	
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
 	local Head = char:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck")
+	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
 	local Torso = char:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
 	local HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
@@ -170,13 +168,13 @@ local function mainclass()
 						wait(length)
 						loadedanimations[5]:Stop()
 						humanoid:UnequipTools()
-						humanoid:EquipTool(tool) 
+						humanoid:EquipTool(tool)
 					elseif hasBayonet == false then
 						hasBayonet = true
 						local length = loadedanimations[6].Length
 						loadedanimations[6]:Play()
 						wait(length)
-						loadedanimations[6]:Stop()
+						loadedanimations[6]:Stop() 
 					end
 					onbayonet:FireServer(hasBayonet)
 				elseif input.KeyCode == Enum.KeyCode.X then
@@ -222,8 +220,8 @@ local function mainclass()
 				local HeadPosition = Head.CFrame.p
 
 				if Neck and Waist then
-					if Camera.CameraSubject:IsDescendantOf(char) or Camera.CameraSubject:IsDescendantOf(client) then
-						local Point = cursor.Hit.p
+					if Camera.CameraSubject:IsDescendantOf(char) or Camera.CameraSubject:IsDescendantOf(player) then
+						local Point = mouse.Hit.p
 
 						local Distance = (Head.CFrame.p - Point).Magnitude
 						local Difference = Head.CFrame.Y - Point.Y
