@@ -31,13 +31,13 @@ local function mainclass()
 
 	local Players = game:GetService("Players")
 	local client = Players.LocalPlayer
-	local animator = client.Character:WaitForChild("Humanoid"):WaitForChild("Animator")
+	local Character = client.Character or client.CharacterAdded:Wait()
+	local animator = Character:WaitForChild("Humanoid"):WaitForChild("Animator") 
 	local cursor = client:GetMouse() 
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
-	local Character = client.Character or client.CharacterAdded:Wait()
 	local Head = Character:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck")
+	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
 	local Torso = Character:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
 	local Humanoid = Character:WaitForChild("Humanoid")
@@ -90,7 +90,7 @@ local function mainclass()
 						elseif reloading == true then
 							while wait() do
 								if reloading == false then
-									break 
+									break  
 								end
 							end
 						else
@@ -98,7 +98,7 @@ local function mainclass()
 							newgui.Frame.ReserveAmmo.Text = reserveammo.Value
 							
 							newheat.BarFrame.Bar.Size = UDim2.new(0.01 * heatvalue, 0, 0, 0)  
-							if heatvalue ~= 0 then
+							if heatvalue > 0 then
 								heatvalue -= 0.1
 							end
 							if heatvalue < 50 then
@@ -238,10 +238,10 @@ local function mainclass()
 				heatvalue += 1
 				loadanimations[4]:Stop()
 				if heatvalue >= 100 then
-						
+					
 					local newheat = tool.Body:WaitForChild("HeatBar")
 					newheat:Destroy()
-				
+					
 					local explosion = Instance.new("Explosion")
 					explosion.BlastRadius = 10
 					explosion.ExplosionType = "NoCraters"
@@ -270,7 +270,7 @@ local function mainclass()
 					if jammed == false then
 						jammed = true
 					end
-				end 
+				end
 				
 			else
 				print("Not Reloading...")
