@@ -82,6 +82,11 @@ local function mainclass()
 		local success, errormessage = pcall(function()
 			if equipped == false then
 				equipped = true
+				player.CameraMode = Enum.CameraMode.LockFirstPerson
+				mouse.Icon = "rbxassetid://117431027";
+				game.ReplicatedStorage.ConnectM6D:FireServer(tool.BodyAttach)
+				char.UpperTorso.ToolGrip.Part0 = char.UpperTorso
+				char.UpperTorso.ToolGrip.Part1 = tool.BodyAttach
 				local newgui = gui:Clone()
 				newgui.Parent = player.PlayerGui
 				loadedanimations[1]:Play()
@@ -117,6 +122,9 @@ local function mainclass()
 				equipped = false
 				local newgui = player.PlayerGui:FindFirstChild("ToolGUI")
 				if newgui then
+					mouse.Icon = "rbxassetid://0";
+					player.CameraMode = Enum.CameraMode.Classic 
+					game.ReplicatedStorage.DisconnectM6D:FireServer()  
 					newgui:Destroy()
 				end
 				loadedanimations[1]:Stop()
