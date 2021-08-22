@@ -1,8 +1,6 @@
 local function mainclass()
-	 
 	local tool = script.Parent
-	local Players = game:GetService("Players")
-	local player = Players.LocalPlayer
+	local player = game.Players.LocalPlayer
 	local char = player.Character or player.CharacterAdded:Wait()
 	local userinputservice = game:GetService("UserInputService")
 	local runservice = game:GetService("RunService")
@@ -25,11 +23,15 @@ local function mainclass()
 	local hasBayonet = false
 	local zoomed = false
 	local sprinting = false
-	
+
+	local Players = game:GetService("Players")
+	local client = Players.LocalPlayer
+	local animator = char:WaitForChild("Humanoid"):WaitForChild("Animator") 
+	local cursor = client:GetMouse() 
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
 	local Head = char:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
+	local Neck = Head:WaitForChild("Neck")
 	local Torso = char:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
 	local HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
@@ -220,8 +222,8 @@ local function mainclass()
 				local HeadPosition = Head.CFrame.p
 
 				if Neck and Waist then
-					if Camera.CameraSubject:IsDescendantOf(char) or Camera.CameraSubject:IsDescendantOf(player) then
-						local Point = mouse.Hit.p
+					if Camera.CameraSubject:IsDescendantOf(char) or Camera.CameraSubject:IsDescendantOf(client) then
+						local Point = cursor.Hit.p
 
 						local Distance = (Head.CFrame.p - Point).Magnitude
 						local Difference = Head.CFrame.Y - Point.Y
@@ -269,4 +271,4 @@ local function mainclass()
 end
 
 print("Client-Sided script loaded - from Kar98k")
-mainclass()
+mainclass() 
