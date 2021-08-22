@@ -1,6 +1,8 @@
 local function mainclass()
+	 
 	local tool = script.Parent
-	local player = game.Players.LocalPlayer
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
 	local char = player.Character or player.CharacterAdded:Wait()
 	local userinputservice = game:GetService("UserInputService")
 	local runservice = game:GetService("RunService")
@@ -18,20 +20,17 @@ local function mainclass()
 	local reserveammo = values:WaitForChild("ReserveAmmo")
 	local clipsize = values:WaitForChild("ClipSize")
 	local gui = tool:WaitForChild("ToolGUI")
+	local debounce = false
 	local equipped = false
 	local reloading = false
 	local hasBayonet = false
 	local zoomed = false
 	local sprinting = false
-
-	local Players = game:GetService("Players")
-	local client = Players.LocalPlayer
-	local animator = char:WaitForChild("Humanoid"):WaitForChild("Animator") 
-	local cursor = client:GetMouse() 
+	
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
 	local Head = char:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck")
+	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
 	local Torso = char:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
 	local HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
@@ -62,7 +61,13 @@ local function mainclass()
 		local success, errormessage = pcall(function()
 			if equipped == false then
 				equipped = true
-			
+				
+				player.CameraMode = Enum.CameraMode.LockFirstPerson
+				mouse.Icon = "rbxassetid://117431027";
+				game.ReplicatedStorage.ConnectM6D:FireServer(tool.BodyAttach)
+				char.UpperTorso.ToolGrip.Part0 = char.UpperTorso
+				char.UpperTorso.ToolGrip.Part1 = tool.BodyAttach
+				
 				loadedanimations[3]:Play()
 				local clone = gui:Clone()
 				clone.Parent = player.PlayerGui
@@ -71,7 +76,7 @@ local function mainclass()
 					
 					if equipped == false then
 						break
-					elseif reloading == true then
+					elseif reloading == true then 
 						while wait() do
 							if reloading == false then
 								break
@@ -96,6 +101,9 @@ local function mainclass()
 			if equipped == true then
 				equipped = false
 				reloading = false
+				mouse.Icon = "rbxassetid://0";
+				player.CameraMode = Enum.CameraMode.Classic 
+				game.ReplicatedStorage.DisconnectM6D:FireServer() 
 				local length = loadedanimations[4].Length
 				loadedanimations[3]:Stop()
 				loadedanimations[4]:Play()
@@ -148,9 +156,18 @@ local function mainclass()
 	local function shoot()
 		local success, errormessage = pcall(function()
 			if equipped == true and reloading == false and hasBayonet == false then
-				loadedanimations[1]:Play()
-				onshoot:FireServer(mouse.Hit.Position)
-				loadedanimations[1]:Stop()
+				if ammo.Value >= 1 then
+					if debounce == false then
+						debounce = true
+						local length = loadedanimations[1].Length
+						loadedanimations[1]:Play()
+						onshoot:FireServer(mouse.Hit.Position)
+						wait(length)
+						loadedanimations[1]:Stop()
+						wait(1)
+						debounce = false 
+					end
+				end
 			end
 		end)
 		
@@ -165,18 +182,18 @@ local function mainclass()
 				if input.KeyCode == Enum.KeyCode.B then
 					if hasBayonet == true then
 						hasBayonet = false
-						local length = loadedanimations[5].Length
-						loadedanimations[5]:Play()
+						local length = loadedanimations[6].Length
+						loadedanimations[6]:Play()
 						wait(length)
-						loadedanimations[5]:Stop()
+						loadedanimations[6]:Stop()
 						humanoid:UnequipTools()
 						humanoid:EquipTool(tool)
 					elseif hasBayonet == false then
 						hasBayonet = true
-						local length = loadedanimations[6].Length
-						loadedanimations[6]:Play()
+						local length = loadedanimations[5].Length
+						loadedanimations[5]:Play()
 						wait(length)
-						loadedanimations[6]:Stop() 
+						loadedanimations[5]:Stop() 
 					end
 					onbayonet:FireServer(hasBayonet)
 				elseif input.KeyCode == Enum.KeyCode.X then
@@ -222,8 +239,8 @@ local function mainclass()
 				local HeadPosition = Head.CFrame.p
 
 				if Neck and Waist then
-					if Camera.CameraSubject:IsDescendantOf(char) or Camera.CameraSubject:IsDescendantOf(client) then
-						local Point = cursor.Hit.p
+					if Camera.CameraSubject:IsDescendantOf(char) or Camera.CameraSubject:IsDescendantOf(player) then
+						local Point = mouse.Hit.p
 
 						local Distance = (Head.CFrame.p - Point).Magnitude
 						local Difference = Head.CFrame.Y - Point.Y
@@ -259,6 +276,17 @@ local function mainclass()
 			warn(errormessage)
 		end
 	end
+	
+	local function died()
+		local success, errormessage = pcall(function()
+			mouse.Icon = "rbxassetid://0"; 
+			player.CameraMode = Enum.CameraMode.Classic
+		end)
+		
+		if not success then
+			warn(errormessage)
+		end
+	end
 
 	tool.Activated:Connect(shoot)
 	tool.Equipped:Connect(equip)
@@ -268,7 +296,8 @@ local function mainclass()
 	userinputservice.InputBegan:Connect(zoom)
 	userinputservice.InputBegan:Connect(sprint)
 	runservice.RenderStepped:Connect(look)
+	humanoid.Died:Connect(died)
 end
 
 print("Client-Sided script loaded - from Kar98k")
-mainclass() 
+mainclass()
