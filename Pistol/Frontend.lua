@@ -52,6 +52,12 @@ local function mainclass()
 			
 			if equipped == false then
 				equipped = true
+				
+				player.CameraMode = Enum.CameraMode.LockFirstPerson
+				mouse.Icon = "rbxassetid://117431027";
+				game.ReplicatedStorage.ConnectM6D:FireServer(tool.BodyAttach)
+				char.UpperTorso.ToolGrip.Part0 = char.UpperTorso
+				char.UpperTorso.ToolGrip.Part1 = tool.BodyAttach 
 				loadedanimations[1]:Play()
 				local newgui = gui:Clone()
 				newgui.Parent = player.PlayerGui
@@ -124,6 +130,9 @@ local function mainclass()
 				local newgui = player.PlayerGui:FindFirstChild("ToolGUI")
 				if newgui then
 					newgui:Destroy()
+					player.CameraMode = Enum.CameraMode.Classic
+					mouse.Icon = "rbxassetid://0";
+					game.ReplicatedStorage.DisconnectM6D:FireServer()  
 					loadedanimations[1]:Stop()
 					local length = loadedanimations[2].Length
 					loadedanimations[2]:Play()
@@ -185,6 +194,17 @@ local function mainclass()
 		end
 		
 	end
+	
+	local function died()
+		local success, errormessage = pcall(function()
+			mouse.Icon = "rbxassetid://0"; 
+			player.CameraMode = Enum.CameraMode.Classic
+		end)
+
+		if not success then
+			warn(errormessage)
+		end
+	end 
 
 	tool.Activated:Connect(shoot)
 	tool.Equipped:Connect(equip)
@@ -196,4 +216,4 @@ end
 
 print("Client-Sided script loaded - from pistol")
 mainclass()
-
+ 
