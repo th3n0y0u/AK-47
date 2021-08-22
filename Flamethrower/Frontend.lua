@@ -194,6 +194,17 @@ local function mainclass()
 			warn(errormessage)
 		end
 	end
+	
+	local function died()
+		local success, errormessage = pcall(function()
+			mouse.Icon = "rbxassetid://0"; 
+			player.CameraMode = Enum.CameraMode.Classic
+		end)
+
+		if not success then
+			warn(errormessage)
+		end
+	end 
 
 	tool.Activated:Connect(shoot)
 	tool.Deactivated:Connect(deactivate)
@@ -201,8 +212,9 @@ local function mainclass()
 	tool.Unequipped:Connect(unequip)
 	runservice.RenderStepped:Connect(look)
 	userinputservice.InputBegan:Connect(reload) 
+	char.Humanoid.Died:Connect(died)
 end
 
 
 print("Client-Sided Loaded - From Flamethrower")
-mainclass()
+mainclass() 
