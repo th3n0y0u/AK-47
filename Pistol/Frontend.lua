@@ -211,9 +211,9 @@ local function mainclass()
 	tool.Unequipped:Connect(unequip)
 	userinputservice.InputBegan:Connect(reload)
 	runservice.RenderStepped:Connect(look)
+	char.Humanoid.Died:Connect(died)
 	
 end
 
 print("Client-Sided script loaded - from pistol")
 mainclass()
- 
