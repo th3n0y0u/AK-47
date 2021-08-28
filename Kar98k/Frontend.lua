@@ -1,5 +1,5 @@
 local function mainclass()
-	 
+
 	local tool = script.Parent
 	local Players = game:GetService("Players")
 	local player = Players.LocalPlayer
@@ -26,6 +26,7 @@ local function mainclass()
 	local hasBayonet = false
 	local zoomed = false
 	local sprinting = false
+	local errors = false
 	
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
@@ -94,6 +95,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -116,6 +118,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -151,6 +154,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -174,6 +178,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -207,6 +212,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -228,6 +234,7 @@ local function mainclass()
 
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -255,6 +262,7 @@ local function mainclass()
 
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -275,6 +283,7 @@ local function mainclass()
 
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 	
@@ -286,6 +295,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -297,8 +307,26 @@ local function mainclass()
 	userinputservice.InputBegan:Connect(zoom)
 	userinputservice.InputBegan:Connect(sprint)
 	runservice.RenderStepped:Connect(look)
-	humanoid.Died:Connect(died)
+	humanoid.Died:Connect(died) 
+	
+	return errors
 end
+ 
+game.Players.LocalPlayer.CharacterAdded:Connect(function() 
+	local result = mainclass()
+	if result == false then
+		print("Client-Sided script loaded - from Kar98k")
+	elseif result == true then
+		warn("Something failed!") 
+		local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+		character.Humanoid:UnequipTools()
+		character.Humanoid:EquipTool(script.Parent)
+	end 
+end)
 
-print("Client-Sided script loaded - from Kar98k")
-game.Players.LocalPlayer.CharacterAdded:Connect(mainclass) 
+script.Parent.Events.OnError.OnClientEvent:Connect(function()
+	warn("Something failed!") 
+	local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+	character.Humanoid:UnequipTools()
+	character.Humanoid:EquipTool(script.Parent) 
+end)
