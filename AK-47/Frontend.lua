@@ -37,7 +37,8 @@ local function mainclass()
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
 	local Head = Character:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
+	repeat wait() until Head:FindFirstChild("Neck") ~= nil
+	local Neck = Head:FindFirstChild("Neck")
 	local Torso = Character:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
 	local Humanoid = Character:WaitForChild("Humanoid")
@@ -74,7 +75,7 @@ local function mainclass()
 	local function equip()
 		local success, errormessage = pcall(function()
 			if equipped == false and hasBayonet == false then
-				equipped = true
+				equipped = true 
 				local newheat = heat:Clone()
 				newheat.Parent = tool.Body 
 				newheat.Enabled = true
@@ -414,4 +415,4 @@ local function mainclass()
 end
 
 print("Starting up client-sided script(From AK-47)")
-mainclass()
+game.Players.LocalPlayer.CharacterAdded:Connect(mainclass)
