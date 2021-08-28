@@ -30,7 +30,8 @@ local function mainclass()
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
 	local Head = char:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
+	repeat wait() until Head:FindFirstChild("Neck") ~= nil
+	local Neck = Head:FindFirstChild("Neck")
 	local Torso = char:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
 	local HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
@@ -66,7 +67,7 @@ local function mainclass()
 				mouse.Icon = "rbxassetid://117431027";
 				game.ReplicatedStorage.ConnectM6D:FireServer(tool.BodyAttach)
 				char.UpperTorso.ToolGrip.Part0 = char.UpperTorso
-				char.UpperTorso.ToolGrip.Part1 = tool.BodyAttach
+				char.UpperTorso.ToolGrip.Part1 = tool.BodyAttach 
 				
 				loadedanimations[3]:Play()
 				local clone = gui:Clone()
@@ -103,7 +104,7 @@ local function mainclass()
 				reloading = false
 				mouse.Icon = "rbxassetid://0";
 				player.CameraMode = Enum.CameraMode.Classic 
-				game.ReplicatedStorage.DisconnectM6D:FireServer() 
+				game.ReplicatedStorage.DisconnectM6D:FireServer()  
 				local length = loadedanimations[4].Length
 				loadedanimations[3]:Stop()
 				loadedanimations[4]:Play()
@@ -300,4 +301,4 @@ local function mainclass()
 end
 
 print("Client-Sided script loaded - from Kar98k")
-mainclass()
+game.Players.LocalPlayer.CharacterAdded:Connect(mainclass) 
