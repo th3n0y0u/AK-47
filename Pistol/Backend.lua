@@ -14,6 +14,7 @@ local function mainclass()
 	local headshotmultiplier = values:WaitForChild("HeadShotMultiplier")
 	local torsoshotmultiplier = values:WaitForChild("TorsoShotMultiplier")
 	local debounce = false
+	local errors = false
 
 	local function equip()
 		
@@ -35,6 +36,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -61,6 +63,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -113,6 +116,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -140,7 +144,6 @@ local function mainclass()
 					local raycastParams = RaycastParams.new()
 					raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
 					raycastParams.FilterDescendantsInstances = {
-						tool.Handle,
 						tool.ShootPart
 					}
 					
@@ -299,6 +302,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -308,8 +312,20 @@ local function mainclass()
 	tool.Equipped:Connect(equip)
 	tool.Unequipped:Connect(unequip)
 	
+	return errors
 end
 
-script.Parent.Instructions:Destroy()
-print("Server-sided script loaded - from Pistol")
-mainclass()
+local player = game.Players:GetPlayerFromCharacter(script.Parent.Parent) or script.Parent.Parent.Parent
+player.CharacterAdded:Connect(function()
+	script.Parent:FindFirstChild("Instructions"):Destroy()
+	if script.Parent:FindFirstChild("Instructions") == nil then
+		local result = mainclass()
+
+		if result == false then
+			print("Server-Sided Script loading - From Pistol")  
+		elseif result == true then 
+			warn("Something failed!")
+			script.Parent.Events.OnError:FireClient(player)
+		end
+	end
+end)
