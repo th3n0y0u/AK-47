@@ -43,6 +43,7 @@ local function mainclass()
 	local debounce = false
 	local reloading = false
 	local equipped = false
+	local errors = false
 
 	local function equip()
 		local success, errormessage = pcall(function()
@@ -69,6 +70,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -96,6 +98,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -161,6 +164,7 @@ local function mainclass()
 		
 		if not success then 
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -399,6 +403,7 @@ local function mainclass()
 		
 		if not success then 
 			warn(errormessage)
+			errors = true
 		end
 	end
 	
@@ -501,6 +506,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 	
@@ -522,6 +528,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 	
@@ -577,6 +584,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 	
@@ -591,6 +599,7 @@ local function mainclass()
 	
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 	
@@ -605,6 +614,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 	
@@ -622,6 +632,8 @@ local function mainclass()
 	tool.Equipped:Connect(equip)
 	tool.Unequipped:Connect(unequip)
 	player.Character.Humanoid.Died:Connect(death)
+	
+	return errors
 end
 
 local player = game.Players:GetPlayerFromCharacter(script.Parent.Parent) or script.Parent.Parent.Parent
@@ -637,4 +649,4 @@ player.CharacterAdded:Connect(function()
 			script.Parent.Events.OnError:FireClient(player)
 		end
 	end
-end)
+end) 
