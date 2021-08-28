@@ -11,6 +11,7 @@ local function mainclass()
 	local damage = values:WaitForChild("Damage")
 	local mag = tool:WaitForChild("Mag")
 	local shooting = false 
+	local errors = false
 
 	local function reload()
 		
@@ -53,6 +54,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -89,6 +91,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 
 	end 
@@ -240,6 +243,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -264,6 +268,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -288,6 +293,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -297,8 +303,21 @@ local function mainclass()
 	onreload.OnServerEvent:Connect(reload)
 	tool.Equipped:Connect(equip)
 	tool.Unequipped:Connect(unequip)
+	
+	return errors
 end
 
-script.Parent.Instructions:Destroy() 
-print("Server-Sided Loaded - From Flamethrower")
-mainclass()
+local player = game.Players:GetPlayerFromCharacter(script.Parent.Parent) or script.Parent.Parent.Parent
+player.CharacterAdded:Connect(function()
+	script.Parent:FindFirstChild("Instructions"):Destroy()
+	if script.Parent:FindFirstChild("Instructions") == nil then
+		local result = mainclass()
+
+		if result == false then
+			print("Server-Sided Script loading - From Pistol") 
+		elseif result == true then 
+			warn("Something failed!")
+			script.Parent.Events.OnError:FireClient(player)
+		end
+	end
+end) 
