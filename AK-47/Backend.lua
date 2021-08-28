@@ -624,6 +624,17 @@ local function mainclass()
 	player.Character.Humanoid.Died:Connect(death)
 end
 
-script.Parent.Instructions:Destroy() 
-print("Starting up server-sided script(From AK-47)")
-mainclass()
+local player = game.Players:GetPlayerFromCharacter(script.Parent.Parent) or script.Parent.Parent.Parent
+player.CharacterAdded:Connect(function()
+	script.Parent:FindFirstChild("Instructions"):Destroy()
+	if script.Parent:FindFirstChild("Instructions") == nil then
+		local result = mainclass()
+
+		if result == false then
+			print("Server-Sided Script loading - From AK-47") 
+		elseif result == true then
+			warn("Something failed!")
+			script.Parent.Events.OnError:FireClient(player)
+		end
+	end
+end)
