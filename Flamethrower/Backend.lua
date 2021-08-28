@@ -314,7 +314,7 @@ player.CharacterAdded:Connect(function()
 		local result = mainclass()
 
 		if result == false then
-			print("Server-Sided Script loading - From Pistol") 
+			print("Server-Sided Script loading - From Flamethrower") 
 		elseif result == true then 
 			warn("Something failed!")
 			script.Parent.Events.OnError:FireClient(player)
