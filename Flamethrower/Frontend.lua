@@ -22,7 +22,8 @@ local function mainclass()
 	local Camera = workspace.CurrentCamera
 
 	local Head = char:WaitForChild("Head")
-	local Neck = Head:WaitForChild("Neck") or Head:FindFirstChildOfClass("Motor6D")
+	repeat wait() until Head:FindFirstChild("Neck") ~= nil
+	local Neck = Head:FindFirstChild("Neck") 
 	local Torso = char:WaitForChild("UpperTorso")
 	local Waist = Torso:WaitForChild("Waist")
 	local HumanoidRootPart = char:WaitForChild("HumanoidRootPart")
@@ -84,9 +85,9 @@ local function mainclass()
 				equipped = true
 				player.CameraMode = Enum.CameraMode.LockFirstPerson
 				mouse.Icon = "rbxassetid://117431027";
-				game.ReplicatedStorage.ConnectM6D:FireServer(tool.BodyAttach)
+				game.ReplicatedStorage.ConnectM6D:FireServer(tool.BodyAttach, tool)
 				char.UpperTorso.ToolGrip.Part0 = char.UpperTorso
-				char.UpperTorso.ToolGrip.Part1 = tool.BodyAttach
+				char.UpperTorso.ToolGrip.Part1 = tool.BodyAttach 
 				local newgui = gui:Clone()
 				newgui.Parent = player.PlayerGui
 				loadedanimations[1]:Play()
@@ -124,7 +125,7 @@ local function mainclass()
 				if newgui then
 					mouse.Icon = "rbxassetid://0";
 					player.CameraMode = Enum.CameraMode.Classic 
-					game.ReplicatedStorage.DisconnectM6D:FireServer()  
+					game.ReplicatedStorage.DisconnectM6D:FireServer(tool)  
 					newgui:Destroy()
 				end
 				loadedanimations[1]:Stop()
@@ -217,4 +218,4 @@ end
 
 
 print("Client-Sided Loaded - From Flamethrower")
-mainclass() 
+game.Players.LocalPlayer.CharacterAdded:Connect(mainclass)
