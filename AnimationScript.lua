@@ -4,14 +4,16 @@ local function mainclass()
 			player.CharacterAdded:Connect(function(char)	
 				if char then
 					local success, errormessage = pcall(function()
-						local toolgrip = Instance.new("Motor6D", char.UpperTorso) 
+						local torso = char.UpperTorso or char.Torso
+						local toolgrip = Instance.new("Motor6D", torso) 
 						toolgrip.Name = "ToolGrip" 
 					end)
-					
+
 					if not success then
 						warn(errormessage)
 						char:BreakJoints()
 					end 
+					
 				end
 			end) 
 		end
@@ -23,12 +25,13 @@ local function mainclass()
 				local realtool = player.Backpack:FindFirstChild(tool.Name) or player.Character:FindFirstChild(tool.Name)
 				if location == realtool:FindFirstChild("BodyAttach") then
 					local char = player.Character
-					char.UpperTorso.ToolGrip.Part0 = char.UpperTorso
-					char.UpperTorso.ToolGrip.Part1 = location
+					local torso = char.UpperTorso or char.Torso
+					torso.ToolGrip.Part0 = torso
+					torso.ToolGrip.Part1 = location
 				end
 			end
 		end)
-		
+
 		if not success then
 			warn(errormessage)
 			player.Character:BreakJoints() 
@@ -40,11 +43,12 @@ local function mainclass()
 			if player and tool then
 				local realtool = player.Backpack:FindFirstChild(tool.Name) or player.Character:FindFirstChild(tool.Name)
 				if realtool then
-					player.Character.UpperTorso.ToolGrip.Part1 = nil
+					local torso = player.Character.UpperTorso or player.Character.Torso
+					torso.ToolGrip.Part1 = nil
 				end
 			end
 		end)
-		
+
 		if not success then
 			warn(errormessage)
 			player.Character:BreakJoints() 
@@ -56,5 +60,4 @@ local function mainclass()
 	game.ReplicatedStorage.DisconnectM6D.OnServerEvent:Connect(disconnectM6D)
 end
 
-mainclass()
- 
+mainclass() 
