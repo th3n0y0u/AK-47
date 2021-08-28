@@ -14,9 +14,8 @@ local function mainclass()
 	local onstab = events:WaitForChild("OnStab")
 	local onsprint = events:WaitForChild("OnSprint")
 	local shootpart = tool:WaitForChild("ShootPart")
-	local bolt = tool:WaitForChild("Bolt")
-	local chamber = tool:WaitForChild("Bullet Chamber")
 	local debounce = false
+	local errors = false
 
 	local function equip()
 		
@@ -38,6 +37,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -62,6 +62,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -71,7 +72,7 @@ local function mainclass()
 		local success, errormessage = pcall(function()
 			local function reloadsound()
 				local sound = Instance.new("Sound", tool)
-				sound.SoundId = "rbxassetid://5214579647"
+				sound.SoundId = "rbxassetid://466364249" 
 				sound.Volume = 1
 				sound.PlaybackSpeed = 1
 				sound:Play()
@@ -91,7 +92,8 @@ local function mainclass()
 
 			local mag = tool:WaitForChild("Mag")
 			local clone = mag:Clone()
-			mag.Transparency = 1 
+			
+			mag.Transparency = 1  
 			
 			for i, v in pairs(clone:GetChildren()) do
 				v:Destroy()
@@ -104,6 +106,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 	 
@@ -159,10 +162,9 @@ local function mainclass()
 						tool.Barrel,
 						tool.Blade,
 						tool.Body,
-						tool.Bolt,
 						tool.Connection,
 						tool.Decor,
-						tool.BladeDecor,
+						tool.Bolt,
 						tool.Goal,
 						tool.Mag,
 						tool.Rod,
@@ -172,7 +174,6 @@ local function mainclass()
 						tool.Trigger,
 						tool["Bullet Chamber"],
 						tool.Ejection,
-						tool.Handle,
 						tool.Holder,
 						tool.Insert,
 						tool.ShootPart
@@ -185,6 +186,7 @@ local function mainclass()
 					local distance = (origin - intersection).Magnitude
 					bullet_clone.Name = "Bullet"
 					bullet_clone.Anchored = true
+					bullet_clone.Transparency = 1
 					bullet_clone.Size = Vector3.new(0.05, 0.05, distance/2)
 					bullet_clone.CanCollide = false
 					bullet_clone.BrickColor = BrickColor.new("New Yeller")
@@ -312,11 +314,12 @@ local function mainclass()
 					wait(1)
 					debounce = false
 					bullet_clone:Destroy()
-					wait(5)
+					wait(5) 
 				end)
 				
 				if not success then
 					warn(errormessage)
+					errors = true
 				end
 			end
 		end
@@ -342,6 +345,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -388,6 +392,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -402,6 +407,7 @@ local function mainclass()
 
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -412,8 +418,21 @@ local function mainclass()
 	onsprint.OnServerEvent:Connect(sprinting)
 	tool.Equipped:Connect(equip)
 	tool.Unequipped:Connect(unequip)
+	
+	return errors
 end
 
-script.Parent.Instructions:Destroy()
-print("Server-Sided Script loading - From Kar98k") 
-mainclass()
+local player = game.Players:GetPlayerFromCharacter(script.Parent.Parent) or script.Parent.Parent.Parent
+player.CharacterAdded:Connect(function()
+	script.Parent:FindFirstChild("Instructions"):Destroy()
+	if script.Parent:FindFirstChild("Instructions") == nil then
+		local result = mainclass()
+		
+		if result == false then
+			print("Server-Sided Script loading - From Kar98k") 
+		elseif result == true then
+			warn("Something failed!")
+			script.Parent.Events.OnError:FireClient(player)
+		end
+	end
+end)
