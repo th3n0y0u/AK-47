@@ -21,6 +21,7 @@ local function mainclass()
 	local gui = tool:WaitForChild("ToolGUI")
 	local reloading = false
 	local equipped = false
+	local errors = false
 
 	local userinputservice = game:GetService("UserInputService")
 	local Camera = workspace.CurrentCamera
@@ -83,6 +84,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -118,6 +120,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -146,6 +149,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -162,6 +166,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -192,6 +197,7 @@ local function mainclass()
 
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 		
 	end
@@ -204,6 +210,7 @@ local function mainclass()
 
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end 
 
@@ -214,7 +221,24 @@ local function mainclass()
 	runservice.RenderStepped:Connect(look)
 	char.Humanoid.Died:Connect(died)
 	
+	return errors
 end
 
-print("Client-Sided script loaded - from pistol")
-game.Players.LocalPlayer.CharacterAdded:Connect(mainclass)
+game.Players.LocalPlayer.CharacterAdded:Connect(function() 
+	local result = mainclass()
+	if result == false then
+		print("Client-Sided script loaded - from Pistol")
+	elseif result == true then
+		warn("Something failed!") 
+		local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+		character.Humanoid:UnequipTools()
+		character.Humanoid:EquipTool(script.Parent)
+	end 
+end)
+
+script.Parent.Events.OnError.OnClientEvent:Connect(function()
+	warn("Something failed!") 
+	local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+	character.Humanoid:UnequipTools()
+	character.Humanoid:EquipTool(script.Parent) 
+end)   
