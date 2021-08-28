@@ -31,6 +31,7 @@ local function mainclass()
 	local WaistOriginC0 = Waist.C0 
 	local debounce = false
 	local reloading = false
+	local errors = false
 
 	Neck.MaxVelocity = 1/2
 
@@ -61,6 +62,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -75,6 +77,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -113,6 +116,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -138,6 +142,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -166,6 +171,7 @@ local function mainclass()
 		
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 
@@ -193,6 +199,7 @@ local function mainclass()
 
 		if not success then
 			warn(errormessage)
+			errors = true
 		end
 	end
 	
@@ -204,6 +211,7 @@ local function mainclass()
 
 		if not success then
 			warn(errormessage)
+			errors = true 
 		end
 	end 
 
@@ -214,8 +222,25 @@ local function mainclass()
 	runservice.RenderStepped:Connect(look)
 	userinputservice.InputBegan:Connect(reload) 
 	char.Humanoid.Died:Connect(died)
+	
+	return errors
 end
 
+game.Players.LocalPlayer.CharacterAdded:Connect(function() 
+	local result = mainclass()
+	if result == false then
+		print("Client-Sided script loaded - from Flamethrower")
+	elseif result == true then
+		warn("Something failed!") 
+		local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+		character.Humanoid:UnequipTools()
+		character.Humanoid:EquipTool(script.Parent)
+	end 
+end)
 
-print("Client-Sided Loaded - From Flamethrower")
-game.Players.LocalPlayer.CharacterAdded:Connect(mainclass)
+script.Parent.Events.OnError.OnClientEvent:Connect(function()
+	warn("Something failed!") 
+	local character = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+	character.Humanoid:UnequipTools()
+	character.Humanoid:EquipTool(script.Parent) 
+end) 
